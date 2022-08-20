@@ -1,20 +1,44 @@
 <!DOCTYPE html>
 <html>
-<head>
-<script>
-    const select = document.getElementsByTagName('select')[0];
-
-    const stations = (await fetch({ url: 'https://api.ratas.tartu.ee/cxf/am/station/map/search', method: 'POST'})).results;
-    stations.forEach(station => {
-        const option = document.createElement('option');
-        option.innerText = station.description;
-        select.appendChild(option);
-    });
-    
-</script>
-</head>
 <body>
-<select></select>
+<script>
+    const STATIONS_IDS_KEY = 'stationIds';
+    const body = document.getElementsByTagName('body')[0];
 
+    const select = document.createElement('select');
+    select.onchange = () => {
+        const station = select.options[select.selectedIndex].station;
+        const stationIds = JSON.parse(localStorage.getItem(STATIONS_IDS_KEY) || '[]');
+        stationIds.push(station.id);
+        localStorage.setItem(STATIONS_IDS_KEY, JSON.stringify(stationIds));
+    };
+    body.append(select);
+
+    fetch('https://api.ratas.tartu.ee/cxf/am/station/map/search', {
+        method: 'POST',
+        body: JSON.stringify({ isPublic: true, limit: -1 }),
+        headers: { 'Content-Type': 'application/json' },
+    })
+        .then(response => response.json())
+        .then(({ results }) => results.forEach(station => {
+            const option = document.createElement('option');
+            option.innerText = station.description;
+            option.station = station;
+
+            select.appendChild(option);
+        }))
+        .then(() => {
+            JSON.parse(localStorage.getItem(STATIONS_IDS_KEY) || '[]').forEach(async stationId => {
+                const response = await fetch('https://api.ratas.tartu.ee/cxf/am/station/' + stationId);
+                const responseBody = await response.json();
+
+                const paragraph = document.createElement('p');
+                paragraph.innerHTML = responseBody.description;
+                responseBody.lockedCycleTypeCount.forEach(({ cycleType, countPrimary, countSecondary }) => paragraph.innerHTML += ` ${cycleType} ${countPrimary} ${countSecondary}`);
+                body.append(paragraph);
+            });
+        })
+    ;
+</script>
 </body>
 </html>
