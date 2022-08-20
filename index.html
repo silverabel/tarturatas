@@ -1,7 +1,20 @@
 <!DOCTYPE html>
 <html>
+<head>
+<script>
+    const select = document.getElementsByTagName('select')[0];
+
+    const stations = (await fetch({ url: 'https://api.ratas.tartu.ee/cxf/am/station/map/search', method: 'POST'})).results;
+    stations.forEach(station => {
+        const option = document.createElement('option');
+        option.innerText = station.description;
+        select.appendChild(option);
+    });
+    
+</script>
+</head>
 <body>
-    asd
+<select></select>
 
 </body>
 </html>
