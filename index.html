@@ -26,8 +26,8 @@
             option.station = station;
 
             select.appendChild(option);
-        }))
-        .then(() => {
+        }));
+  
             JSON.parse(localStorage.getItem(STATIONS_IDS_KEY) || '[]').forEach(async stationId => {
                 const response = await fetch('https://api.ratas.tartu.ee/cxf/am/station/' + stationId);
                 const responseBody = await response.json();
@@ -37,8 +37,6 @@
                 responseBody.lockedCycleTypeCount.forEach(({ cycleType, countPrimary, countSecondary }) => paragraph.innerHTML += ` ${cycleType} ${countPrimary} ${countSecondary}`);
                 body.append(paragraph);
             });
-        })
-    ;
 </script>
 </body>
 </html>
