@@ -1,42 +1,94 @@
 <!DOCTYPE html>
 <html>
+<head>
+<style>
+  body {
+    font-size: 3rem;
+  }
+  
+  select {
+    width: 100%;
+    height: 10rem;
+    font-size: 3rem;
+  }
+</style>
+</head>
 <body>
 <script>
-    const STATIONS_IDS_KEY = 'stationIds';
-    const body = document.getElementsByTagName('body')[0];
+const KEY = 'stationIds';
+const stations = [];
 
-    const select = document.createElement('select');
-    select.onchange = () => {
-        const station = select.options[select.selectedIndex].station;
-        const stationIds = JSON.parse(localStorage.getItem(STATIONS_IDS_KEY) || '[]');
-        stationIds.push(station.id);
-        localStorage.setItem(STATIONS_IDS_KEY, JSON.stringify(stationIds));
-    };
-    body.append(select);
+const make = (n) => document.createElement(n);
 
-    fetch('https://api.ratas.tartu.ee/cxf/am/station/map/search', {
-        method: 'POST',
-        body: JSON.stringify({ isPublic: true, limit: -1 }),
-        headers: { 'Content-Type': 'application/json' },
-    })
-        .then(response => response.json())
-        .then(({ results }) => results.forEach(station => {
-            const option = document.createElement('option');
-            option.innerText = station.description;
-            option.station = station;
+const getStation = (id) => {
+  const s =
+    stations.find(({sId}) => sId === id)
+    || make('p');
+};
 
-            select.appendChild(option);
-        }));
+const getIds = () => JSON.parse(
+  localStorage.getItem(KEY) || '[]'
+);
+
+const url = 'https://api.ratas.tartu.ee/cxf/am/station/';
+
+const body = document
+  .getElementsByTagName('body')[0];
+
+const select = make('select');
+body.append(select);
+    
+select.onchange = () => {
+  const id = select
+    .options[select.selectedIndex]
+    .station
+    .id;
+    
+  localStorage.setItem(
+    KEY,
+    JSON.stringify([...getIds(), id]));
+};
+
+fetch(url + 'map/search', {
+  method: 'POST',
+  body: JSON.stringify({
+    isPublic: true,
+    limit: -1,
+  }),
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
+  .then(response => response.json())
+  .then(({ results }) =>
+    results.forEach(station => {
+      const o = make('option');
+      o.innerText = station.description;
+      o.station = station;
+
+      select.appendChild(o);
+  }));
   
-            JSON.parse(localStorage.getItem(STATIONS_IDS_KEY) || '[]').forEach(async stationId => {
-                const response = await fetch('https://api.ratas.tartu.ee/cxf/am/station/' + stationId);
-                const responseBody = await response.json();
+getIds().forEach(async id => {
+  const b = await
+    (await fetch(url + id)).json();
 
-                const paragraph = document.createElement('p');
-                paragraph.innerHTML = responseBody.description;
-                responseBody.lockedCycleTypeCount.forEach(({ cycleType, countPrimary, countSecondary }) => paragraph.innerHTML += ` ${cycleType} ${countPrimary} ${countSecondary}`);
-                body.append(paragraph);
-            });
+  const p = make('p');
+  
+  p.innerHTML = b.description;
+      
+  b.lockedCycleTypeCount.forEach(({
+    cycleType,
+    countPrimary,
+    countSecondary,
+  }) => p.innerHTML += `
+    ${cycleType}
+    ${countPrimary} +
+    ${countSecondary}`
+  );
+  
+  body.append(p);
+});
 </script>
 </body>
 </html>
