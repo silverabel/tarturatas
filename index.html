@@ -14,29 +14,49 @@
 </style>
 </head>
 <body>
+<select></select>
 <script>
 const KEY = 'stationIds';
-const stations = [];
-
-const make = (n) => document.createElement(n);
-
-const getStation = (id) => {
-  const s =
-    stations.find(({sId}) => sId === id)
-    || make('p');
-};
-
-const getIds = () => JSON.parse(
-  localStorage.getItem(KEY) || '[]'
-);
 
 const url = 'https://api.ratas.tartu.ee/cxf/am/station/';
 
 const body = document
   .getElementsByTagName('body')[0];
 
-const select = make('select');
-body.append(select);
+const make = (n) => document.createElement(n);
+
+const getIds = () => JSON.parse(
+  localStorage.getItem(KEY) || '[]'
+);
+
+const setDetail = async p => {
+  const b = await
+    (await fetch(url + p.stationId)).json();
+  
+  p.innerHTML += b.lockedCycleTypeCount.map(({
+    cycleType,
+    countPrimary,
+    countSecondary,
+  }) => `
+    ${cycleType}
+    ${countPrimary} +
+    ${countSecondary}`
+  ).join(', ');
+  
+  body.append(p);
+};
+
+const stations = getIds().map(id => {
+  const p = make('p');
+  p.stationId = id;
+  p.innerHTML = `{name}: Total {primary} + {secondary}, `;
+  body.append(p);
+  setDetail(p);
+  
+  return p;
+});
+
+const select = document.getElementsByTagName('select')[0];
     
 select.onchange = () => {
   const id = select
@@ -67,28 +87,15 @@ fetch(url + 'map/search', {
       o.station = station;
 
       select.appendChild(o);
+      
+      const p = stations.find(({stationId}) => stationId === station.id);
+      
+      if (p) {
+        p.innerHTML = p.innerHTML.replace('{name}', station. description).replace('{primary}', station.primaryLockedCycleCount).replace('{secondary}', station.secondaryLockedCycleCount);
+      } 
   }));
   
-getIds().forEach(async id => {
-  const b = await
-    (await fetch(url + id)).json();
 
-  const p = make('p');
-  
-  p.innerHTML = b.description;
-      
-  b.lockedCycleTypeCount.forEach(({
-    cycleType,
-    countPrimary,
-    countSecondary,
-  }) => p.innerHTML += `
-    ${cycleType}
-    ${countPrimary} +
-    ${countSecondary}`
-  );
-  
-  body.append(p);
-});
 </script>
 </body>
 </html>
