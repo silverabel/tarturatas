@@ -29,11 +29,11 @@ const getIds = () => JSON.parse(
   localStorage.getItem(KEY) || '[]'
 );
 
-const setDetail = async p => {
+const setDetail = async div => {
   const b = await
-    (await fetch(url + p.stationId)).json();
+    (await fetch(url + div.stationId)).json();
   
-  p.innerHTML += b.lockedCycleTypeCount.map(({
+  div.p.innerHTML += b.lockedCycleTypeCount.map(({
     cycleType,
     countPrimary,
     countSecondary,
@@ -42,20 +42,23 @@ const setDetail = async p => {
     ${countPrimary} +
     ${countSecondary}`
   ).join(', ');
-  
-  body.append(p);
 };
 
 const stations = getIds().map(id => {
+  const div = make('div');
+  const h = make('h2');
   const p = make('p');
-  p.stationId = id;
-  p.innerHTML = `{name}: Total {primary} + {secondary}, `;
-  body.append(p);
-  setDetail(p);
+  div.append(h, p);
+  div.stationId = id;
+  div.h = h;
+  div.p = p;
+  p.innerHTML = `Total {primary} + {secondary}, `;
+  body.append(div);
+  setDetail(div);
   
-  return p;
+  return div;
 });
-
+ 
 const select = document.getElementsByTagName('select')[0];
     
 select.onchange = () => {
@@ -88,10 +91,11 @@ fetch(url + 'map/search', {
 
       select.appendChild(o);
       
-      const p = stations.find(({stationId}) => stationId === station.id);
+      const div = stations.find(({stationId}) => stationId === station.id);
       
-      if (p) {
-        p.innerHTML = p.innerHTML.replace('{name}', station. description).replace('{primary}', station.primaryLockedCycleCount).replace('{secondary}', station.secondaryLockedCycleCount);
+      if (div) {
+        div.h.innerHTML = station.description;
+        div.p.innerHTML = div.p.innerHTML.replace('{primary}', station.primaryLockedCycleCount).replace('{secondary}', station.secondaryLockedCycleCount);
       } 
   }));
   
