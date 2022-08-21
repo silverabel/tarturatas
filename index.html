@@ -25,9 +25,16 @@ const body = document
 
 const make = (n) => document.createElement(n);
 
-const getIds = () => JSON.parse(
+const getIds = () => new Set(JSON.parse(
   localStorage.getItem(KEY) || '[]'
-);
+));
+
+const remove = id => {
+  const ids = getIds();
+  ids.delete(id);
+  
+  localStorage.setItem(KEY, JSON.stringify([...ids]));
+} 
 
 const setDetail = async div => {
   const b = await
@@ -44,9 +51,15 @@ const setDetail = async div => {
   ).join(', ');
 };
 
-const stations = getIds().map(id => {
+const stations = [...getIds()].map((id) => {
   const div = make('div');
-  const h = make('h2');
+  const h = make('h6');
+  const s = make('span');
+  const b = make('button');
+  b.innerHTML = 'X';
+  b.onclick = () => remove(id);
+  h.append(s, b);
+  h.s = s;
   const p = make('p');
   div.append(h, p);
   div.stationId = id;
@@ -94,7 +107,7 @@ fetch(url + 'map/search', {
       const div = stations.find(({stationId}) => stationId === station.id);
       
       if (div) {
-        div.h.innerHTML = station.description;
+        div.h.s.innerHTML = station.description;
         div.p.innerHTML = div.p.innerHTML.replace('{primary}', station.primaryLockedCycleCount).replace('{secondary}', station.secondaryLockedCycleCount);
       } 
   }));
