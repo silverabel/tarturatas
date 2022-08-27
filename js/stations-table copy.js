@@ -1,8 +1,8 @@
 import { Fetcher } from "./fetcher.js";
-import { LocalStorage } from "./storage.js";
 export class StationsTable {
-    static init() {
-        LocalStorage.getStations().forEach((station) => {
+    static init(stations) {
+        StationsTable.ROWS = [];
+        stations.forEach(station => {
             const row = StationsTable.TEMPLATE.content.querySelector('tr').cloneNode(true);
             row.station = station;
             row.querySelector('td.name').innerHTML = station.description;
@@ -26,4 +26,3 @@ export class StationsTable {
 }
 StationsTable.BODY = document.querySelector('tbody');
 StationsTable.TEMPLATE = document.querySelector('template');
-StationsTable.ROWS = [];

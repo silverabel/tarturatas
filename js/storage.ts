@@ -1,18 +1,41 @@
-import { IStation } from "./model";
+import { IGroup, IStorageStation } from "./model.js";
+import { State } from "./state.js";
 
-export class Storage {
+export class LocalStorage {
 
-    private static KEY = 'stations';
+    private static KEY = 'stationGroups';
+    private static groups: IGroup[];
 
-    static get = (): Set<IStation> => new Set(JSON.parse(localStorage.getItem(Storage.KEY) || '[]') as IStation[]);
-    static add = (station: IStation): void => Storage.set([...Storage.get(), { id: station.id, description: station.description }]);
+    static getGroups(): IGroup[] {
+        if (!LocalStorage.groups) LocalStorage.groups = JSON.parse(localStorage.getItem(LocalStorage.KEY) || '[]');
 
-    static remove = (station: IStation) => {
-        const stations: Set<IStation> = Storage.get();
-        stations.delete(station);
-        
-        Storage.set([...stations]);
+        return LocalStorage.groups;
     }
 
-    private static set = (stations: IStation[]): void => localStorage.setItem(Storage.KEY, JSON.stringify(stations));
+    static addStation(station: IStorageStation): void {
+        const group = LocalStorage.groups.find(g => g.name === State.group.name) as IGroup;
+        if (!group.stations) group.stations = [];
+        group.stations.push(station);
+
+        LocalStorage.save();
+    }
+
+    static removeStation(station: IStorageStation) {
+        const group = LocalStorage.groups.find(g => g.name === State.group.name) as IGroup;
+        group.stations?.splice(group.stations.indexOf(station), 1);
+
+        LocalStorage.save();
+    }
+
+    static addGroup(name: string): void {
+        LocalStorage.groups.push({ name });
+        LocalStorage.save();
+    }
+
+    static removeGroup(group: IGroup): void {
+        LocalStorage.groups.splice(LocalStorage.groups.indexOf(group), 1);
+        LocalStorage.save();
+    }
+
+    private static save = (): void => localStorage.setItem(LocalStorage.KEY, JSON.stringify(LocalStorage.groups));
 }

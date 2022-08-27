@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <title>Ratas</title>
     <style>
         :root {
-            --select-height: 10rem;
             --font-size: 3rem;
         }
 
@@ -13,26 +13,20 @@
 
         body {
             height: 100%;
+            font-size: var(--font-size);
             margin: 0;
         }
 
-        select {
-            width: 100%;
-            height: var(--select-height);
-            font-size: 3rem;
-        }
-
         table {
-            height: calc(100% - var(--select-height));
             width: 100%;
             border-spacing: 0;
+            line-height: calc(var(--font-size) * 2);
         }
 
         td, th {
-            width: calc(var(--font-size) * 3);
+            min-width: calc(var(--font-size) * 3);
             border: 1px solid;
             padding: 0;
-            font-size: var(--font-size);
             text-align: center;
         }
 
@@ -40,33 +34,98 @@
             width: calc(var(--font-size) * 10);
         }
 
+        .delete {
+            min-width: 4rem;
+        }
+
         td.name {
             text-align: left;
+        }
+
+        button, select, input {
+            font-size: inherit;
+            line-height: inherit;
+            border: 0;
+            width: 100%;
+            height: 100%;
+            padding: 0;
+        }
+
+        .bottom {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            display: flex;
+        }
+
+        .bottom :last-child {
+            flex-grow: 1;
         }
     </style>
     <script src="js/index.js" type="module"></script>
 </head>
 <body>
-    <select></select>
-    <table>
-        <thead>
-            <tr>
-                <th class="name">Nimi</th>
-                <th>Kokku</th>
-                <th>Tava</th>
-                <th>Elekter</th>
-            </tr>
-        </thead>
-        <tbody>
-            <template>
+    <div id="group-container">
+        <table>
+            <thead>
                 <tr>
-                    <td class="name"></td>
-                    <td class="total"></td>
-                    <td class="bike"></td>
-                    <td class="pedelec"></td>
+                    <th class="name">Grupi nimi</th>
+                    <th>Jaamu</th>
+                    <th class="delete"></th>
                 </tr>
-            </template>
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                <template>
+                    <tr>
+                        <td class="name"></td>
+                        <td class="count"></td>
+                        <td class="delete">
+                            <button>X</button>
+                        </td>
+                    </tr>
+                </template>
+                <tr class="bottom">
+                    <td class="name">
+                        <input placeholder="Uus grupp...">
+                    </td>
+                    <td>
+                        <button onclick="addGroup()">Lisa</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div id="station-container" hidden>
+        <table>
+            <thead>
+                <tr>
+                    <th class="name">Nimi</th>
+                    <th>Kokku</th>
+                    <th>Tava</th>
+                    <th>Elekter</th>
+                </tr>
+            </thead>
+            <tbody>
+                <template>
+                    <tr>
+                        <td class="name"></td>
+                        <td class="total"></td>
+                        <td class="bike"></td>
+                        <td class="pedelec"></td>
+                    </tr>
+                </template>
+                <tr>
+                    <td colspan="4">
+                        <select></select>
+                    </td>
+                </tr>
+                <tr class="bottom">
+                    <td>
+                        <button onclick="showGroupTable()">Tagasi</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </body>
 </html>

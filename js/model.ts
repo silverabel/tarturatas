@@ -1,9 +1,19 @@
-export interface IStation {
+export interface IGroup {
+    
+    name: string;
+    stations?: IStorageStation[];
+}
+
+export interface IStorageStation {
 
     id: string;
     description: string;
-    primaryLockedCycleCount?: number;
-    secondaryLockedCycleCount?: number;
+}
+
+export interface IStation extends IStorageStation {
+
+    primaryLockedCycleCount: number;
+    secondaryLockedCycleCount: number;
 }
 
 export interface IStationDetail extends IStation {

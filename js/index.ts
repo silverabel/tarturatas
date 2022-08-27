@@ -1,13 +1,7 @@
-import { Fetcher } from "./fetcher.js";
-import { IStation } from "./model.js";
-import { Select } from "./select.js";
-import { Table } from "./table.js";
+import { GroupTable } from "./group-table.js";
+import { State } from "./state.js";
 
-Table.init();
+State.showGroupTable();
 
-Fetcher.getAll().then((stations: IStation[]) => {
-    Select.init(stations);
-    Table.setTotals(stations);
-});
-
-Table.setDetails();
+(window as any).addGroup = (): void => GroupTable.addGroup();
+(window as any).showGroupTable = (): void => State.showGroupTable();

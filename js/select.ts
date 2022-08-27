@@ -1,6 +1,6 @@
 import { Fetcher } from "./fetcher.js";
 import { IStation } from "./model.js";
-import { Storage } from "./storage.js";
+import { LocalStorage } from "./storage.js";
 
 interface IOption extends HTMLOptionElement {
 
@@ -9,10 +9,11 @@ interface IOption extends HTMLOptionElement {
 
 export class Select {
 
-    private static ELEMENT = document.querySelector('select') as HTMLSelectElement;
+    static initialized = false;
+    private static element = document.querySelector('select') as HTMLSelectElement;
 
     static async init(stations: IStation[]) {
-        Select.ELEMENT.onchange = () => Storage.add((Select.ELEMENT.options[Select.ELEMENT.selectedIndex] as IOption).station);
+        Select.element.onchange = () => LocalStorage.addStation((Select.element.options[Select.element.selectedIndex] as IOption).station);
 
         const options: IOption[] = stations.map((station: IStation) => {
             const option = document.createElement('option') as IOption;
@@ -22,6 +23,8 @@ export class Select {
             return option;
         });
 
-        Select.ELEMENT.append(...options);
+        Select.element.append(...options);
+
+        Select.initialized = true;
     }
 }
