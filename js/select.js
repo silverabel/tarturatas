@@ -1,7 +1,8 @@
+import { StationTable } from "./station-table.js";
 import { LocalStorage } from "./storage.js";
 export class Select {
     static async init(stations) {
-        Select.element.onchange = () => LocalStorage.addStation(Select.element.options[Select.element.selectedIndex].station);
+        Select.element.onchange = Select.addStation;
         const options = stations.map((station) => {
             const option = document.createElement('option');
             option.station = station;
@@ -10,6 +11,12 @@ export class Select {
         });
         Select.element.append(...options);
         Select.initialized = true;
+    }
+    static addStation() {
+        const station = Select.element.options[Select.element.selectedIndex].station;
+        LocalStorage.addStation(station);
+        StationTable.addRow(station);
+        StationTable.setTotals(station);
     }
 }
 Select.initialized = false;

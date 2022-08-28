@@ -27,8 +27,8 @@ export class LocalStorage {
         LocalStorage.save();
     }
 
-    static addGroup(name: string): void {
-        LocalStorage.groups.push({ name });
+    static addGroup(group: IGroup): void {
+        LocalStorage.groups.push(group);
         LocalStorage.save();
     }
 

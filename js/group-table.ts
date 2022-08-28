@@ -14,21 +14,11 @@ export class GroupTable {
     static initialized = false;
     private static container = document.querySelector('#group-container') as HTMLDivElement;
     private static addGroupRow = GroupTable.container.querySelector('#add-group') as HTMLTableRowElement;
+    private static templateRow = (GroupTable.container.querySelector('template') as HTMLTemplateElement).content.querySelector('tr') as HTMLTableRowElement;
+    private static tableBody = (GroupTable.container.querySelector('tbody') as HTMLTableSectionElement);
 
     static init(): void {
-        const templateRow = (GroupTable.container.querySelector('template') as HTMLTemplateElement).content.querySelector('tr') as HTMLTableRowElement;
-        const tableBody = (GroupTable.container.querySelector('tbody') as HTMLTableSectionElement);
-
-        LocalStorage.getGroups().forEach((group: IGroup) => {
-            const row = templateRow.cloneNode(true) as IRow;
-            row.group = group;
-            (row.querySelector('td.name') as HTMLTableCellElement).innerHTML = group.name;
-            (row.querySelector('td.count') as HTMLTableCellElement).innerHTML = group.stations?.length?.toString() || '0';
-            (row.querySelector('td.delete button') as HTMLButtonElement).onclick = (event: MouseEvent) => GroupTable.removeGroup(group, event);
-            row.onclick = () => State.showStationTable(group);
-
-            tableBody.insertBefore(row, GroupTable.addGroupRow);
-        });
+        LocalStorage.getGroups().forEach(GroupTable.addRow);
 
         GroupTable.initialized = true;
         GroupTable.addGroupRow.hidden = false;
@@ -40,11 +30,29 @@ export class GroupTable {
 
     static addGroup(): void {
         const name = GroupTable.container.querySelector('input')?.value;
-        if (name) LocalStorage.addGroup(name);
+        if (name) {
+            const group: IGroup = { name };
+            LocalStorage.addGroup(group);
+            GroupTable.addRow(group);
+        }
     }
 
-    private static removeGroup(group: IGroup, event: MouseEvent): void {
+    private static addRow(group: IGroup): void {
+        const row = GroupTable.templateRow.cloneNode(true) as IRow;
+        row.group = group;
+        (row.querySelector('td.name') as HTMLTableCellElement).innerHTML = group.name;
+        (row.querySelector('td.count') as HTMLTableCellElement).innerHTML = group.stations?.length?.toString() || '0';
+        (row.querySelector('td.delete button') as HTMLButtonElement).onclick = (event: MouseEvent) => GroupTable.remove(row, event);
+        row.onclick = () => State.showStationTable(group);
+
+        GroupTable.tableBody.insertBefore(row, GroupTable.addGroupRow);
+    }
+
+    private static remove(row: IRow, event: MouseEvent): void {
         event.stopPropagation();
-        confirm('Kustuta?') && LocalStorage.removeGroup(group);
+        if (confirm('Kustuta?')) {
+            LocalStorage.removeGroup(row.group);
+            row.remove();
+        }
     }
 }

@@ -20,27 +20,18 @@ export class StationTable {
         StationTable.rows?.forEach(row => row.remove());
         StationTable.rows = [];
 
-        group.stations?.forEach(station => {
-            const row = (StationTable.template.content.querySelector('tr') as HTMLTableRowElement).cloneNode(true) as IRow;
-            row.station = station;
-            (row.querySelector('td.name') as HTMLTableCellElement).innerHTML = station.description;
-            row.onclick = () => confirm('Kustuta?') && LocalStorage.removeStation(station);
-            StationTable.setDetails(row);
-            StationTable.body.insertBefore(row, StationTable.body.firstChild);
-
-            StationTable.rows.push(row);
-        });
+        group.stations?.forEach(StationTable.addRow);
 
         Fetcher.getAll().then((stations: IStation[]) => {
             if (!Select.initialized) Select.init(stations);
-            StationTable.setTotals(stations);
+            StationTable.setTotals(...stations);
         });
     }
 
-    static setTotals(stations: IStation[]): void {
+    static setTotals(...stations: IStation[]): void {
         StationTable.rows.forEach((row: IRow) => {
             const station = stations.find(s => s.id === row.station.id);
-            (row.querySelector('td.total') as HTMLTableCellElement).innerHTML = `${station?.primaryLockedCycleCount} + ${station?.secondaryLockedCycleCount}`;
+            if (station) (row.querySelector('td.total') as HTMLTableCellElement).innerHTML = `${station?.primaryLockedCycleCount} + ${station?.secondaryLockedCycleCount}`;
         });
     }
 
@@ -52,5 +43,21 @@ export class StationTable {
 
     static setHidden(hidden: boolean): void {
         StationTable.container.hidden = hidden;
+    }
+    
+    static addRow(station: IStorageStation): void {
+        const row = (StationTable.template.content.querySelector('tr') as HTMLTableRowElement).cloneNode(true) as IRow;
+        row.station = station;
+        (row.querySelector('td.name') as HTMLTableCellElement).innerHTML = station.description;
+        row.onclick = () => confirm('Kustuta?') && StationTable.remove(row);
+        StationTable.setDetails(row);
+        StationTable.body.insertBefore(row, StationTable.body.firstChild);
+
+        StationTable.rows.push(row);
+    }
+
+    private static remove(row: IRow): void {
+        LocalStorage.removeStation(row.station);
+        row.remove();
     }
 }

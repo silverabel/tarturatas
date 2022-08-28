@@ -6,25 +6,18 @@ export class StationTable {
         var _a, _b;
         (_a = StationTable.rows) === null || _a === void 0 ? void 0 : _a.forEach(row => row.remove());
         StationTable.rows = [];
-        (_b = group.stations) === null || _b === void 0 ? void 0 : _b.forEach(station => {
-            const row = StationTable.template.content.querySelector('tr').cloneNode(true);
-            row.station = station;
-            row.querySelector('td.name').innerHTML = station.description;
-            row.onclick = () => confirm('Kustuta?') && LocalStorage.removeStation(station);
-            StationTable.setDetails(row);
-            StationTable.body.insertBefore(row, StationTable.body.firstChild);
-            StationTable.rows.push(row);
-        });
+        (_b = group.stations) === null || _b === void 0 ? void 0 : _b.forEach(StationTable.addRow);
         Fetcher.getAll().then((stations) => {
             if (!Select.initialized)
                 Select.init(stations);
-            StationTable.setTotals(stations);
+            StationTable.setTotals(...stations);
         });
     }
-    static setTotals(stations) {
+    static setTotals(...stations) {
         StationTable.rows.forEach((row) => {
             const station = stations.find(s => s.id === row.station.id);
-            row.querySelector('td.total').innerHTML = `${station === null || station === void 0 ? void 0 : station.primaryLockedCycleCount} + ${station === null || station === void 0 ? void 0 : station.secondaryLockedCycleCount}`;
+            if (station)
+                row.querySelector('td.total').innerHTML = `${station === null || station === void 0 ? void 0 : station.primaryLockedCycleCount} + ${station === null || station === void 0 ? void 0 : station.secondaryLockedCycleCount}`;
         });
     }
     static setDetails(row) {
@@ -34,6 +27,19 @@ export class StationTable {
     }
     static setHidden(hidden) {
         StationTable.container.hidden = hidden;
+    }
+    static addRow(station) {
+        const row = StationTable.template.content.querySelector('tr').cloneNode(true);
+        row.station = station;
+        row.querySelector('td.name').innerHTML = station.description;
+        row.onclick = () => confirm('Kustuta?') && StationTable.remove(row);
+        StationTable.setDetails(row);
+        StationTable.body.insertBefore(row, StationTable.body.firstChild);
+        StationTable.rows.push(row);
+    }
+    static remove(row) {
+        LocalStorage.removeStation(row.station);
+        row.remove();
     }
 }
 StationTable.container = document.querySelector('#station-container');

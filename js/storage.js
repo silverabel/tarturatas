@@ -18,8 +18,8 @@ export class LocalStorage {
         (_a = group.stations) === null || _a === void 0 ? void 0 : _a.splice(group.stations.indexOf(station), 1);
         LocalStorage.save();
     }
-    static addGroup(name) {
-        LocalStorage.groups.push({ name });
+    static addGroup(group) {
+        LocalStorage.groups.push(group);
         LocalStorage.save();
     }
     static removeGroup(group) {
