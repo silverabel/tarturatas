@@ -3,9 +3,10 @@ import { Select } from "./select.js";
 import { LocalStorage } from "./storage.js";
 export class StationTable {
     static async init(group) {
-        var _a;
+        var _a, _b;
+        (_a = StationTable.rows) === null || _a === void 0 ? void 0 : _a.forEach(row => row.remove());
         StationTable.rows = [];
-        (_a = group.stations) === null || _a === void 0 ? void 0 : _a.forEach(station => {
+        (_b = group.stations) === null || _b === void 0 ? void 0 : _b.forEach(station => {
             const row = StationTable.template.content.querySelector('tr').cloneNode(true);
             row.station = station;
             row.querySelector('td.name').innerHTML = station.description;

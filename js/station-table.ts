@@ -17,6 +17,7 @@ export class StationTable {
     private static rows: IRow[];
 
     static async init(group: IGroup): Promise<void> {
+        StationTable.rows?.forEach(row => row.remove());
         StationTable.rows = [];
 
         group.stations?.forEach(station => {
@@ -29,7 +30,6 @@ export class StationTable {
 
             StationTable.rows.push(row);
         });
-
 
         Fetcher.getAll().then((stations: IStation[]) => {
             if (!Select.initialized) Select.init(stations);

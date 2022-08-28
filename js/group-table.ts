@@ -13,6 +13,7 @@ export class GroupTable {
 
     static initialized = false;
     private static container = document.querySelector('#group-container') as HTMLDivElement;
+    private static addGroupRow = GroupTable.container.querySelector('#add-group') as HTMLTableRowElement;
 
     static init(): void {
         const templateRow = (GroupTable.container.querySelector('template') as HTMLTemplateElement).content.querySelector('tr') as HTMLTableRowElement;
@@ -24,12 +25,13 @@ export class GroupTable {
             (row.querySelector('td.name') as HTMLTableCellElement).innerHTML = group.name;
             (row.querySelector('td.count') as HTMLTableCellElement).innerHTML = group.stations?.length?.toString() || '0';
             (row.querySelector('td.delete button') as HTMLButtonElement).onclick = (event: MouseEvent) => GroupTable.removeGroup(group, event);
-            row.onclick = () => GroupTable.showStations(group);
+            row.onclick = () => State.showStationTable(group);
 
-            tableBody.append(row);
+            tableBody.insertBefore(row, GroupTable.addGroupRow);
         });
 
         GroupTable.initialized = true;
+        GroupTable.addGroupRow.hidden = false;
     }
 
     static setHidden(hidden: boolean): void {
@@ -44,9 +46,5 @@ export class GroupTable {
     private static removeGroup(group: IGroup, event: MouseEvent): void {
         event.stopPropagation();
         confirm('Kustuta?') && LocalStorage.removeGroup(group);
-    }
-
-    private static showStations(group: IGroup): void {
-        State.showStationTable(group);
     }
 }

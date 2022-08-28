@@ -11,10 +11,11 @@ export class GroupTable {
             row.querySelector('td.name').innerHTML = group.name;
             row.querySelector('td.count').innerHTML = ((_b = (_a = group.stations) === null || _a === void 0 ? void 0 : _a.length) === null || _b === void 0 ? void 0 : _b.toString()) || '0';
             row.querySelector('td.delete button').onclick = (event) => GroupTable.removeGroup(group, event);
-            row.onclick = () => GroupTable.showStations(group);
-            tableBody.append(row);
+            row.onclick = () => State.showStationTable(group);
+            tableBody.insertBefore(row, GroupTable.addGroupRow);
         });
         GroupTable.initialized = true;
+        GroupTable.addGroupRow.hidden = false;
     }
     static setHidden(hidden) {
         GroupTable.container.hidden = hidden;
@@ -29,9 +30,7 @@ export class GroupTable {
         event.stopPropagation();
         confirm('Kustuta?') && LocalStorage.removeGroup(group);
     }
-    static showStations(group) {
-        State.showStationTable(group);
-    }
 }
 GroupTable.initialized = false;
 GroupTable.container = document.querySelector('#group-container');
+GroupTable.addGroupRow = GroupTable.container.querySelector('#add-group');
