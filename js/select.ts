@@ -10,7 +10,6 @@ interface IOption extends HTMLOptionElement {
 
 export class Select {
 
-    static initialized = false;
     private static element = document.querySelector('select') as HTMLSelectElement;
 
     static async init(stations: IStation[]) {
@@ -25,14 +24,11 @@ export class Select {
         });
 
         Select.element.append(...options);
-
-        Select.initialized = true;
     }
     
     private static addStation(): void {
         const station: IStation = (Select.element.options[Select.element.selectedIndex] as IOption).station;
         LocalStorage.addStation(station);
-        StationTable.addRow(station);
-        StationTable.setTotals(station);
+        StationTable.addStation(station);
     }
 }

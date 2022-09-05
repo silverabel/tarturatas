@@ -11,17 +11,13 @@ interface IRow extends HTMLTableRowElement {
 
 export class GroupTable {
 
-    static initialized = false;
     private static container = document.querySelector('#group-container') as HTMLDivElement;
     private static addGroupRow = GroupTable.container.querySelector('#add-group') as HTMLTableRowElement;
     private static templateRow = (GroupTable.container.querySelector('template') as HTMLTemplateElement).content.querySelector('tr') as HTMLTableRowElement;
     private static tableBody = (GroupTable.container.querySelector('tbody') as HTMLTableSectionElement);
 
     static init(): void {
-        LocalStorage.getGroups().forEach(GroupTable.addRow);
-
-        GroupTable.initialized = true;
-        GroupTable.addGroupRow.hidden = false;
+        LocalStorage.groups.forEach(GroupTable.addRow);
     }
 
     static setHidden(hidden: boolean): void {

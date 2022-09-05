@@ -2,9 +2,7 @@ import { State } from "./state.js";
 import { LocalStorage } from "./storage.js";
 export class GroupTable {
     static init() {
-        LocalStorage.getGroups().forEach(GroupTable.addRow);
-        GroupTable.initialized = true;
-        GroupTable.addGroupRow.hidden = false;
+        LocalStorage.groups.forEach(GroupTable.addRow);
     }
     static setHidden(hidden) {
         GroupTable.container.hidden = hidden;
@@ -36,7 +34,6 @@ export class GroupTable {
         }
     }
 }
-GroupTable.initialized = false;
 GroupTable.container = document.querySelector('#group-container');
 GroupTable.addGroupRow = GroupTable.container.querySelector('#add-group');
 GroupTable.templateRow = GroupTable.container.querySelector('template').content.querySelector('tr');

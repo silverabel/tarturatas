@@ -9,15 +9,13 @@ export class State {
     static showStationTable(group) {
         var _a;
         if (((_a = State.group) === null || _a === void 0 ? void 0 : _a.name) !== group.name)
-            StationTable.init(group);
+            StationTable.setGroup(group);
         State.group = group;
         State.view = View.STATION_TABLE;
         history.pushState(group, '');
         State.render();
     }
     static showGroupTable() {
-        if (!GroupTable.initialized)
-            GroupTable.init();
         State.view = View.GROUP_TABLE;
         history.pushState(null, '');
         State.render();
@@ -26,7 +24,7 @@ export class State {
         const group = event.state;
         if (group) {
             if (State.group.name !== group.name)
-                StationTable.init(group);
+                StationTable.setGroup(group);
             State.group = group;
             State.view = View.STATION_TABLE;
         }
@@ -48,4 +46,3 @@ export class State {
     }
 }
 State.view = View.GROUP_TABLE;
-State.historyListener = window.onpopstate = State.onHistoryChange;

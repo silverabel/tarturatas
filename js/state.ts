@@ -11,10 +11,9 @@ export class State {
 
     static view = View.GROUP_TABLE;
     static group: IGroup;
-    private static historyListener = window.onpopstate = State.onHistoryChange;
 
     static showStationTable(group: IGroup): void {
-        if (State.group?.name !== group.name) StationTable.init(group);
+        if (State.group?.name !== group.name) StationTable.setGroup(group);
         State.group = group;
         State.view = View.STATION_TABLE;
 
@@ -23,18 +22,16 @@ export class State {
     }
 
     static showGroupTable(): void {
-        if (!GroupTable.initialized) GroupTable.init();
         State.view = View.GROUP_TABLE;
-        
         history.pushState(null, '');
         State.render();
     }
 
-    private static onHistoryChange(event: PopStateEvent): void {
+    static onHistoryChange(event: PopStateEvent): void {
         const group: IGroup = event.state;
 
         if (group) {
-            if (State.group.name !== group.name) StationTable.init(group);
+            if (State.group.name !== group.name) StationTable.setGroup(group);
             State.group = group;
             State.view = View.STATION_TABLE;
         } else {

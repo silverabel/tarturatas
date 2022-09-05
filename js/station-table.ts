@@ -14,18 +14,26 @@ export class StationTable {
 
     private static body = StationTable.container.querySelector('tbody') as HTMLTableSectionElement;
     private static template = StationTable.container.querySelector('template') as HTMLTemplateElement;
-    private static rows: IRow[];
+    private static rows: Map<string, IRow> = new Map();
 
-    static async init(group: IGroup): Promise<void> {
-        StationTable.rows?.forEach(row => row.remove());
-        StationTable.rows = [];
-
-        group.stations?.forEach(StationTable.addRow);
-
-        Fetcher.getAll().then((stations: IStation[]) => {
-            if (!Select.initialized) Select.init(stations);
-            StationTable.setTotals(...stations);
+    static init(): void {
+        LocalStorage.groups.flatMap(group => group.stations).forEach(station => {
+            station && !StationTable.rows.has(station.id) && StationTable.addRow(station);
         });
+    }
+
+    static setGroup(group: IGroup): void {
+        [...StationTable.rows.values()].forEach(row => row.remove());
+        group.stations?.map(({ id }) => StationTable.rows.get(id)).forEach(row => StationTable.body.insertBefore(row as IRow, StationTable.body.firstChild));
+    }
+
+    static addStation(station: IStation): void {
+        if (!StationTable.rows.has(station.id)) {
+            StationTable.addRow(station);
+            StationTable.setTotals(station);
+        }
+
+        StationTable.body.insertBefore(StationTable.rows.get(station.id) as IRow, StationTable.body.firstChild);
     }
 
     static setTotals(...stations: IStation[]): void {
@@ -51,9 +59,8 @@ export class StationTable {
         (row.querySelector('td.name') as HTMLTableCellElement).innerHTML = station.description;
         row.onclick = () => confirm('Kustuta?') && StationTable.remove(row);
         StationTable.setDetails(row);
-        StationTable.body.insertBefore(row, StationTable.body.firstChild);
 
-        StationTable.rows.push(row);
+        StationTable.rows.set(station.id, row);
     }
 
     private static remove(row: IRow): void {

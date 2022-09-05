@@ -10,14 +10,11 @@ export class Select {
             return option;
         });
         Select.element.append(...options);
-        Select.initialized = true;
     }
     static addStation() {
         const station = Select.element.options[Select.element.selectedIndex].station;
         LocalStorage.addStation(station);
-        StationTable.addRow(station);
-        StationTable.setTotals(station);
+        StationTable.addStation(station);
     }
 }
-Select.initialized = false;
 Select.element = document.querySelector('select');

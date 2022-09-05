@@ -3,19 +3,17 @@ import { State } from "./state.js";
 
 export class LocalStorage {
 
+    static groups: IGroup[];
     private static KEY = 'stationGroups';
-    private static groups: IGroup[];
 
-    static getGroups(): IGroup[] {
-        if (!LocalStorage.groups) LocalStorage.groups = JSON.parse(localStorage.getItem(LocalStorage.KEY) || '[]');
-
-        return LocalStorage.groups;
+    static init(): void {
+        LocalStorage.groups = JSON.parse(localStorage.getItem(LocalStorage.KEY) || '[]');
     }
 
     static addStation(station: IStorageStation): void {
         const group = LocalStorage.groups.find(g => g.name === State.group.name) as IGroup;
         if (!group.stations) group.stations = [];
-        group.stations.push(station);
+        if (!group.stations.find(({ id }) => id === station.id)) group.stations.push(station);
 
         LocalStorage.save();
     }

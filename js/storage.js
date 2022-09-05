@@ -1,15 +1,14 @@
 import { State } from "./state.js";
 export class LocalStorage {
-    static getGroups() {
-        if (!LocalStorage.groups)
-            LocalStorage.groups = JSON.parse(localStorage.getItem(LocalStorage.KEY) || '[]');
-        return LocalStorage.groups;
+    static init() {
+        LocalStorage.groups = JSON.parse(localStorage.getItem(LocalStorage.KEY) || '[]');
     }
     static addStation(station) {
         const group = LocalStorage.groups.find(g => g.name === State.group.name);
         if (!group.stations)
             group.stations = [];
-        group.stations.push(station);
+        if (!group.stations.find(({ id }) => id === station.id))
+            group.stations.push(station);
         LocalStorage.save();
     }
     static removeStation(station) {

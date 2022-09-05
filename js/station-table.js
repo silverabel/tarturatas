@@ -1,17 +1,22 @@
 import { Fetcher } from "./fetcher.js";
-import { Select } from "./select.js";
 import { LocalStorage } from "./storage.js";
 export class StationTable {
-    static async init(group) {
-        var _a, _b;
-        (_a = StationTable.rows) === null || _a === void 0 ? void 0 : _a.forEach(row => row.remove());
-        StationTable.rows = [];
-        (_b = group.stations) === null || _b === void 0 ? void 0 : _b.forEach(StationTable.addRow);
-        Fetcher.getAll().then((stations) => {
-            if (!Select.initialized)
-                Select.init(stations);
-            StationTable.setTotals(...stations);
+    static init() {
+        LocalStorage.groups.flatMap(group => group.stations).forEach(station => {
+            station && !StationTable.rows.has(station.id) && StationTable.addRow(station);
         });
+    }
+    static setGroup(group) {
+        var _a;
+        [...StationTable.rows.values()].forEach(row => row.remove());
+        (_a = group.stations) === null || _a === void 0 ? void 0 : _a.map(({ id }) => StationTable.rows.get(id)).forEach(row => StationTable.body.insertBefore(row, StationTable.body.firstChild));
+    }
+    static addStation(station) {
+        if (!StationTable.rows.has(station.id)) {
+            StationTable.addRow(station);
+            StationTable.setTotals(station);
+        }
+        StationTable.body.insertBefore(StationTable.rows.get(station.id), StationTable.body.firstChild);
     }
     static setTotals(...stations) {
         StationTable.rows.forEach((row) => {
@@ -34,8 +39,7 @@ export class StationTable {
         row.querySelector('td.name').innerHTML = station.description;
         row.onclick = () => confirm('Kustuta?') && StationTable.remove(row);
         StationTable.setDetails(row);
-        StationTable.body.insertBefore(row, StationTable.body.firstChild);
-        StationTable.rows.push(row);
+        StationTable.rows.set(station.id, row);
     }
     static remove(row) {
         LocalStorage.removeStation(row.station);
@@ -45,3 +49,4 @@ export class StationTable {
 StationTable.container = document.querySelector('#station-container');
 StationTable.body = StationTable.container.querySelector('tbody');
 StationTable.template = StationTable.container.querySelector('template');
+StationTable.rows = new Map();

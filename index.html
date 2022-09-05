@@ -65,7 +65,7 @@
     <script src="js/index.js" type="module"></script>
 </head>
 <body>
-    <div id="group-container">
+    <div id="group-container" hidden>
         <table>
             <thead>
                 <tr>
@@ -86,7 +86,7 @@
                         </a>
                     </tr>
                 </template>
-                <tr id="add-group" hidden>
+                <tr id="add-group">
                     <td class="name">
                         <input placeholder="Uus grupp...">
                     </td>
@@ -119,11 +119,6 @@
                 <tr>
                     <td colspan="4">
                         <select></select>
-                    </td>
-                </tr>
-                <tr class="bottom">
-                    <td>
-                        <button onclick="showGroupTable()">Grupid</button>
                     </td>
                 </tr>
             </tbody>
