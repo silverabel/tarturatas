@@ -1,7 +1,7 @@
 {
     "name": "Tartu ratas",
     "start_url": "/tarturatas",
-    "display": "fullscreen",
+    "display": "standalone",
     "icons": [
         {
           "src": "ratas.png",
